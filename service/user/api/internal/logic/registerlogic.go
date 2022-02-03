@@ -2,29 +2,42 @@ package logic
 
 import (
 	"context"
-
-	"mall/service/user/api/internal/svc"
 	"mall/service/user/api/internal/types"
+	"mall/service/user/rpc/userclient"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	"mall/service/user/api/internal/svc"
 )
 
 type RegisterLogic struct {
-	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
+	logx.Logger
 }
 
-func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) RegisterLogic {
-	return RegisterLogic{
-		Logger: logx.WithContext(ctx),
+func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *RegisterLogic {
+	return &RegisterLogic{
 		ctx:    ctx,
 		svcCtx: svcCtx,
+		Logger: logx.WithContext(ctx),
 	}
 }
 
 func (l *RegisterLogic) Register(req types.RegisterRequest) (resp *types.RegisterResponse, err error) {
-	// todo: add your logic here and delete this line
+	res, err := l.svcCtx.UserRpc.Register(l.ctx, &userclient.RegisterRequest{
+		Name:     req.Name,
+		Gender:   req.Gender,
+		Mobile:   req.Mobile,
+		Password: req.Password,
+	})
+	if err != nil {
+		return nil, err
+	}
 
-	return
+	return &types.RegisterResponse{
+		Id:     res.Id,
+		Name:   res.Name,
+		Gender: res.Gender,
+		Mobile: res.Mobile,
+	}, nil
 }
