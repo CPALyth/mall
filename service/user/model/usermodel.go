@@ -123,7 +123,7 @@ func (m *defaultUserModel) Delete(id int64) error {
 	_, err = m.Exec(func(conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("delete from %s where `id` = ?", m.table)
 		return conn.Exec(query, id)
-	}, userIdKey, userMobileKey)
+	}, userMobileKey, userIdKey)
 	return err
 }
 
