@@ -19,7 +19,8 @@ var (
 	payRowsExpectAutoSet   = strings.Join(stringx.Remove(payFieldNames, "`id`", "`create_time`", "`update_time`"), ",")
 	payRowsWithPlaceHolder = strings.Join(stringx.Remove(payFieldNames, "`id`", "`create_time`", "`update_time`"), "=?,") + "=?"
 
-	cachePayIdPrefix = "cache:pay:id:"
+	cachePayIdPrefix  = "cache:pay:id:"
+	cachePayOidPrefix = "cache:pay:oid:"
 )
 
 type (
@@ -28,6 +29,7 @@ type (
 		FindOne(id int64) (*Pay, error)
 		Update(data *Pay) error
 		Delete(id int64) error
+		FindOneByOid(oid int64) (*Pay, error)
 	}
 
 	defaultPayModel struct {
@@ -104,4 +106,21 @@ func (m *defaultPayModel) formatPrimary(primary interface{}) string {
 func (m *defaultPayModel) queryPrimary(conn sqlx.SqlConn, v, primary interface{}) error {
 	query := fmt.Sprintf("select %s from %s where `id` = ? limit 1", payRows, m.table)
 	return conn.QueryRow(v, query, primary)
+}
+
+func (m *defaultPayModel) FindOneByOid(oid int64) (*Pay, error) {
+	payOidKey := fmt.Sprintf("%s%v", cachePayOidPrefix, oid)
+	var resp Pay
+	err := m.QueryRow(&resp, payOidKey, func(conn sqlx.SqlConn, v interface{}) error {
+		query := fmt.Sprintf("select %s from %s where `oid` = ? limit 1", payRows, m.table)
+		return conn.QueryRow(v, query, oid)
+	})
+	switch err {
+	case nil:
+		return &resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
 }
