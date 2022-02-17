@@ -33,6 +33,7 @@ func (l *CreateLogic) Create(in *order.CreateRequest) (*order.CreateResponse, er
 		Id: in.Uid,
 	})
 	if err != nil {
+		logx.Info("l.svcCtx.UserRpc.UserInfo failed", err)
 		return nil, err
 	}
 
