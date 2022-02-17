@@ -14,6 +14,8 @@ CacheRedis:
     Type: node
 
 UserRpc:
+  App: payrpc                          # App 标识
+  Token: 6jKNZbEpYGeUMAifz10gOnmoty3TV  # Token 值
   Etcd:
     Hosts:
       - etcd:2379
