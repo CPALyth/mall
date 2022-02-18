@@ -12,7 +12,7 @@ Mysql:
 CacheRedis:
   - Host: redis:6379
     Type: node # node可以不写，可以设为cluster
-    # Pass: xxx # 如果有密码
+    Pass: ws123456
 
 Prometheus:
   Host: 0.0.0.0
